@@ -10,32 +10,22 @@ const initialState = {
 
 export const registerUser = createAsyncThunk(
   "/auth/register",
-
   async (formData) => {
     const response = await axios.post(
       `${import.meta.env.VITE_BASEURL_FOR_SERVER}/api/auth/register`,
-      formData,
-      {
-        withCredentials: true,
-      }
+      formData
     );
-
     return response.data;
   }
 );
 
 export const loginUser = createAsyncThunk(
   "/auth/login",
-
   async (formData) => {
     const response = await axios.post(
       `${import.meta.env.VITE_BASEURL_FOR_SERVER}/api/auth/login`,
-      formData,
-      {
-        withCredentials: true,
-      }
+      formData
     );
-
     return response.data;
   }
 );
@@ -75,22 +65,19 @@ export const logoutUser = createAsyncThunk(
 //   }
 // );
 
-
 export const checkAuth = createAsyncThunk(
   "/auth/checkauth",
-
   async (token) => {
+    if (!token) return { success: false, user: null };
+    
     const response = await axios.get(
       `${import.meta.env.VITE_BASEURL_FOR_SERVER}/api/auth/check-auth`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Cache-Control":
-            "no-store, no-cache, must-revalidate, proxy-revalidate",
         },
       }
     );
-
     return response.data;
   }
 );
@@ -104,6 +91,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
+      sessionStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
@@ -125,13 +113,13 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log(action);
-
         state.isLoading = false;
         state.user = action.payload.success ? action.payload.user : null;
         state.isAuthenticated = action.payload.success;
         state.token = action.payload.token;
-        sessionStorage.setItem("token", JSON.stringify(action.payload.token));
+        if (action.payload.token) {
+          sessionStorage.setItem("token", JSON.stringify(action.payload.token));
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -151,6 +139,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
+        state.token = null;
+        sessionStorage.removeItem("token");
       })
       .addCase(logoutUser.fulfilled, (state, action) => {
         state.isLoading = false;

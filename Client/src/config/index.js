@@ -58,11 +58,12 @@ export const addProductFormElements = [
     name: "category",
     componentType: "select",
     options: [
-      { id: "men", label: "Men" },
-      { id: "women", label: "Women" },
-      { id: "kids", label: "Kids" },
+      { id: "living-room", label: "Living Room" },
+      { id: "bedroom", label: "Bedroom" },
+      { id: "dining-room", label: "Dining Room" },
+      { id: "office", label: "Office" },
+      { id: "outdoor", label: "Outdoor" },
       { id: "accessories", label: "Accessories" },
-      { id: "footwear", label: "Footwear" },
     ],
   },
   {
@@ -70,12 +71,12 @@ export const addProductFormElements = [
     name: "brand",
     componentType: "select",
     options: [
-      { id: "nike", label: "Nike" },
-      { id: "adidas", label: "Adidas" },
-      { id: "puma", label: "Puma" },
-      { id: "levi", label: "Levi's" },
-      { id: "zara", label: "Zara" },
-      { id: "h&m", label: "H&M" },
+      { id: "ikea", label: "IKEA" },
+      { id: "nilkamal", label: "Nilkamal" },
+      { id: "durian", label: "Durian" },
+      { id: "stanley", label: "Stanley" },
+      { id: "hometown", label: "HomeTown" },
+      { id: "royaloak", label: "Royal Oak" }
     ],
   },
   {
@@ -112,10 +113,29 @@ export const shoppingViewHeaderMenuItems = [
     label: "Collections",
     path: "/shop/listing",
   },
-  
   {
-    id: "footwear",
-    label: "Footwear",
+    id: "living-room",
+    label: "Living Room",
+    path: "/shop/listing",
+  },
+  {
+    id: "bedroom",
+    label: "Bedroom",
+    path: "/shop/listing",
+  },
+  {
+    id: "dining-room",
+    label: "Dining Room",
+    path: "/shop/listing",
+  },
+  {
+    id: "office",
+    label: "Office",
+    path: "/shop/listing",
+  },
+  {
+    id: "outdoor",
+    label: "Outdoor",
     path: "/shop/listing",
   },
   {
@@ -131,37 +151,39 @@ export const shoppingViewHeaderMenuItems = [
 ];
 
 export const categoryOptionsMap = {
-  men: "Men",
-  women: "Women",
-  kids: "Kids",
-  accessories: "Accessories",
-  footwear: "Footwear",
+  "living-room": "Living Room",
+  "bedroom": "Bedroom",
+  "dining-room": "Dining Room",
+  "office": "Office",
+  "outdoor": "Outdoor",
+  "accessories": "Accessories",
 };
 
 export const brandOptionsMap = {
-  nike: "Nike",
-  adidas: "Adidas",
-  puma: "Puma",
-  levi: "Levi",
-  zara: "Zara",
-  "h&m": "H&M",
+  "ikea": "IKEA",
+  "nilkamal": "Nilkamal",
+  "durian": "Durian",
+  "stanley": "Stanley",
+  "hometown": "HomeTown",
+  "royaloak": "Royal Oak"
 };
 
 export const filterOptions = {
   category: [
-    { id: "men", label: "Men" },
-    { id: "women", label: "Women" },
-    { id: "kids", label: "Kids" },
+    { id: "living-room", label: "Living Room" },
+    { id: "bedroom", label: "Bedroom" },
+    { id: "dining-room", label: "Dining Room" },
+    { id: "office", label: "Office" },
+    { id: "outdoor", label: "Outdoor" },
     { id: "accessories", label: "Accessories" },
-    { id: "footwear", label: "Footwear" },
   ],
   brand: [
-    { id: "nike", label: "Nike" },
-    { id: "adidas", label: "Adidas" },
-    { id: "puma", label: "Puma" },
-    { id: "levi", label: "Levi's" },
-    { id: "zara", label: "Zara" },
-    { id: "h&m", label: "H&M" },
+    { id: "ikea", label: "IKEA" },
+    { id: "nilkamal", label: "Nilkamal" },
+    { id: "durian", label: "Durian" },
+    { id: "stanley", label: "Stanley" },
+    { id: "hometown", label: "HomeTown" },
+    { id: "royaloak", label: "Royal Oak" }
   ],
 };
 

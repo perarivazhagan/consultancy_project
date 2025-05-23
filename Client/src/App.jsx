@@ -27,48 +27,44 @@ import ProductReviews from "./pages/admin-view/product-reviews";
 import AdminPayments from "./pages/admin-view/payments";
 
 function App() {
-  const { user, isAuthenticated, isLoading } = useSelector(
-    (state) => state.auth
-  );
+  const { user, isAuthenticated, isLoading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const token = JSON.parse(sessionStorage.getItem("token"));
+    const storedToken = sessionStorage.getItem("token");
+    let token = null;
+
+    try {
+      token = storedToken && storedToken !== "undefined" ? JSON.parse(storedToken) : null;
+    } catch (error) {
+      console.error("Invalid token format in sessionStorage:", error);
+    }
+
     dispatch(checkAuth(token));
   }, [dispatch]);
 
-  
-  // const user = "user";
-  // const isAuthenticated = true;
-  // const isLoading = false;
+  if (isLoading) return <Skeleton className="w-[800px] bg-black h-[600px]" />;
 
-  if (isLoading) return <Skeleton className="w-[800] bg-black h-[600px]" />;
+  console.log("Auth loading:", isLoading, "User:", user);
+  console.log("API base URL:", import.meta.env.VITE_BASEURL_FOR_SERVER);
 
-  console.log(isLoading, user);
- console.log(import.meta.env.VITE_BASEURL_FOR_SERVER)
   return (
     <div className="flex flex-col overflow-hidden bg-white">
       <Routes>
         <Route
           path="/"
-          element={
-            <CheckAuth
-              isAuthenticated={isAuthenticated}
-              user={user}
-            ></CheckAuth>
-          }
+          element={<CheckAuth isAuthenticated={isAuthenticated} user={user} />}
         />
-        <Route
-          path="/auth"
-          element={
-            <CheckAuth isAuthenticated={isAuthenticated} user={user}>
-              <AuthLayout />
-            </CheckAuth>
-          }
-        >
-          <Route path="login" element={<AuthLogin />} />
-          <Route path="register" element={<AuthRegister />} />
-        </Route>
+  <Route path="/auth" element={
+  <CheckAuth isAuthenticated={isAuthenticated} user={user}>
+    <AuthLayout />
+  </CheckAuth>
+}>
+  <Route path="login" element={<AuthLogin />} />
+  <Route path="admin-login" element={<AuthLogin userType="admin" />} />
+  <Route path="register" element={<AuthRegister />} />
+</Route>
+
         <Route
           path="/admin"
           element={

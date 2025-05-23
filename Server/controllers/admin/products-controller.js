@@ -3,19 +3,67 @@ const Product = require("../../models/Product");
 
 const handleImageUpload = async (req, res) => {
   try {
+    console.log("Starting image upload process...");
+    
+    if (!req.file) {
+      console.log("No file received in request");
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
+
+    console.log("File received:", {
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      originalname: req.file.originalname
+    });
+
+    // Check file type
+    if (!req.file.mimetype.startsWith('image/')) {
+      console.log("Invalid file type:", req.file.mimetype);
+      return res.status(400).json({
+        success: false,
+        message: "File must be an image",
+      });
+    }
+
+    // Check file size (5MB limit)
+    if (req.file.size > 5 * 1024 * 1024) {
+      console.log("File too large:", req.file.size);
+      return res.status(400).json({
+        success: false,
+        message: "File size must be less than 5MB",
+      });
+    }
+
+    console.log("Converting file to base64...");
     const b64 = Buffer.from(req.file.buffer).toString("base64");
     const url = "data:" + req.file.mimetype + ";base64," + b64;
+    
+    console.log("Uploading to Cloudinary...");
     const result = await imageUploadUtil(url);
+    
+    if (!result || !result.url) {
+      console.log("Cloudinary upload failed:", result);
+      throw new Error("Failed to upload image to Cloudinary");
+    }
 
+    console.log("Upload successful:", result.url);
     res.json({
       success: true,
       result,
     });
   } catch (error) {
-    console.log(error);
-    res.json({
+    console.error("Image upload error details:", {
+      message: error.message,
+      stack: error.stack,
+      error: error
+    });
+    res.status(500).json({
       success: false,
-      message: "Error occured",
+      message: error.message || "Error occurred during image upload",
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 };

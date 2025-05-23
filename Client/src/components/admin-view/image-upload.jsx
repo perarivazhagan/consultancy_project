@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { Skeleton } from "../ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 function ProductImageUpload({
   imageFile,
@@ -17,15 +18,33 @@ function ProductImageUpload({
   isCustomStyling = false,
 }) {
   const inputRef = useRef(null);
+  const { toast } = useToast();
 
   console.log(isEditMode, "isEditMode");
 
   function handleImageFileChange(event) {
-    console.log(event.target.files, "event.target.files");
     const selectedFile = event.target.files?.[0];
-    console.log(selectedFile);
-
-    if (selectedFile) setImageFile(selectedFile);
+    if (selectedFile) {
+      // Check file type
+      if (!selectedFile.type.startsWith('image/')) {
+        toast({
+          title: "Error",
+          description: "Please upload an image file (JPEG, PNG, etc.)",
+          variant: "destructive"
+        });
+        return;
+      }
+      // Check file size (max 5MB)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "Image size should be less than 5MB",
+          variant: "destructive"
+        });
+        return;
+      }
+      setImageFile(selectedFile);
+    }
   }
 
   function handleDragOver(event) {
@@ -35,40 +54,80 @@ function ProductImageUpload({
   function handleDrop(event) {
     event.preventDefault();
     const droppedFile = event.dataTransfer.files?.[0];
-    if (droppedFile) setImageFile(droppedFile);
+    if (droppedFile) {
+      if (!droppedFile.type.startsWith('image/')) {
+        toast({
+          title: "Error",
+          description: "Please upload an image file (JPEG, PNG, etc.)",
+          variant: "destructive"
+        });
+        return;
+      }
+      if (droppedFile.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "Image size should be less than 5MB",
+          variant: "destructive"
+        });
+        return;
+      }
+      setImageFile(droppedFile);
+    }
   }
 
   function handleRemoveImage() {
     setImageFile(null);
+    setUploadedImageUrl("");
     if (inputRef.current) {
       inputRef.current.value = "";
     }
   }
 
   async function uploadImageToCloudinary() {
-    setImageLoadingState(true);
-    const data = new FormData();
-    data.append("my_file", imageFile);
-    const response = await axios.post(
-      "http://localhost:5000/api/admin/products/upload-image",
-      data
-    );
-    console.log(response, "response");
+    try {
+      setImageLoadingState(true);
+      const data = new FormData();
+      data.append("my_file", imageFile);
 
-    if (response?.data?.success) {
-      setUploadedImageUrl(response.data.result.url);
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASEURL_FOR_SERVER}/api/admin/products/upload-image`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response?.data?.success) {
+        setUploadedImageUrl(response.data.result.url);
+        toast({
+          title: "Success",
+          description: "Image uploaded successfully",
+        });
+      } else {
+        throw new Error(response.data.message || "Failed to upload image");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to upload image",
+        variant: "destructive"
+      });
+    } finally {
       setImageLoadingState(false);
     }
   }
 
   useEffect(() => {
-    if (imageFile !== null) uploadImageToCloudinary();
+    if (imageFile !== null) {
+      uploadImageToCloudinary();
+    }
   }, [imageFile]);
 
   return (
-    <div
-      className={`w-full  mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}
-    >
+    <div className={`w-full mt-4 ${isCustomStyling ? "" : "max-w-md mx-auto"}`}>
       <Label className="text-lg font-semibold mb-2 block">Upload Image</Label>
       <div
         onDragOver={handleDragOver}
@@ -80,6 +139,7 @@ function ProductImageUpload({
         <Input
           id="image-upload"
           type="file"
+          accept="image/*"
           className="hidden"
           ref={inputRef}
           onChange={handleImageFileChange}
@@ -94,9 +154,15 @@ function ProductImageUpload({
           >
             <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
             <span>Drag & drop or click to upload image</span>
+            <span className="text-sm text-muted-foreground mt-2">
+              Supported formats: JPEG, PNG, GIF (max 5MB)
+            </span>
           </Label>
         ) : imageLoadingState ? (
-          <Skeleton className="h-10 bg-gray-100" />
+          <div className="flex flex-col items-center justify-center h-32">
+            <Skeleton className="h-10 w-full bg-gray-100" />
+            <span className="text-sm text-muted-foreground mt-2">Uploading...</span>
+          </div>
         ) : (
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -115,6 +181,15 @@ function ProductImageUpload({
           </div>
         )}
       </div>
+      {uploadedImageUrl && (
+        <div className="mt-4">
+          <img 
+            src={uploadedImageUrl} 
+            alt="Uploaded preview" 
+            className="max-h-48 rounded-lg object-contain"
+          />
+        </div>
+      )}
     </div>
   );
 }

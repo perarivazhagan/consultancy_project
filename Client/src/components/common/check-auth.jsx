@@ -21,7 +21,8 @@ function CheckAuth({ isAuthenticated, user, children }) {
     !isAuthenticated &&
     !(
       location.pathname.includes("/login") ||
-      location.pathname.includes("/register")
+      location.pathname.includes("/register") ||
+      location.pathname.includes("/admin-login")
     )
   ) {
     return <Navigate to="/auth/login" />;
@@ -30,7 +31,8 @@ function CheckAuth({ isAuthenticated, user, children }) {
   if (
     isAuthenticated &&
     (location.pathname.includes("/login") ||
-      location.pathname.includes("/register"))
+      location.pathname.includes("/register") ||
+      location.pathname.includes("/admin-login"))
   ) {
     if (user?.role === "admin") {
       return <Navigate to="/admin/dashboard" />;
