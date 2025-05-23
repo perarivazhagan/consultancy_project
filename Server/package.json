@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "server.js",
-    "dev": "nodemon server.js"
+    "start": " node server.js",
+    "dev": "npm run dev"
   },
   "keywords": [],
-  "author": "Dinesh Reddypogu",
+  "author": "perarivazhagan",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
