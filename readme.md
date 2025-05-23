@@ -98,5 +98,3 @@ npm run dev
 - For production deployment, use a secure method to store environment variables, such as secret managers.  
 
 ---
-
-### ❤️ Made with Love by Dinesh  
